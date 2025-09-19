@@ -31,18 +31,33 @@ export default function ProductPage() {
 
     const rowsPerPageOptions = [5, 10, 20, 30];
     const [pageSize, setPageSize] = useState<number>(10);
+    const [total, setTotal] = useState(0);
 
-    useEffect(() => {
-        let url = `https://dummyjson.com/products?limit=50`;
+  useEffect(() => {
+    const skip = (page - 1) * pageSize;
 
-        if (sortBy) {
-        url += `&sortBy=${sortBy}&order=${sortOrder}`;
-        }
+    let url = `https://dummyjson.com/products?limit=${pageSize}&skip=${skip}`;
 
-        fetch(url)
-        .then((res) => res.json())
-        .then((data) => setProducts(data.products || []));
-    }, [sortBy, sortOrder]);
+    if (filterKey && filterValue) {
+      if (filterKey === "title") {
+        url = `https://dummyjson.com/products/search?q=${filterValue}&limit=${pageSize}&skip=${skip}`;
+      } else if (filterKey === "category") {
+        url = `https://dummyjson.com/products/category/${filterValue}?limit=${pageSize}&skip=${skip}`;
+      }
+    }
+
+    if (sortBy) {
+      url += `&sortBy=${sortBy}&order=${sortOrder}`;
+    }
+
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        setProducts(data.products || []);
+        setTotal(data.total || 0);
+      });
+  }, [sortBy, sortOrder, page, pageSize, filterKey, filterValue]);
+
 
     // Filtering
     const filtered = useMemo(() => {
@@ -50,7 +65,7 @@ export default function ProductPage() {
         return products.filter((p) =>
           String(p[filterKey]).toLowerCase().includes(filterValue.toLowerCase())
         );
-    }, [products, filterKey, filterValue]); // <-- add products here
+    }, [products, filterKey, filterValue]);
       
     // Sorting
     const sorted = useMemo(() => {
@@ -63,6 +78,7 @@ export default function ProductPage() {
         return 0;
     });
     }, [filtered, sortKey, sortOrder]);
+    const paginated = sorted;
 
     useEffect(() => {
         console.log("Sorted data changed", {
@@ -72,8 +88,7 @@ export default function ProductPage() {
     },[sorted,products]);
     
     // Pagination
-    const totalPages = Math.ceil(sorted.length / pageSize);
-    const paginated = sorted.slice((page - 1) * pageSize, page * pageSize);
+    const totalPages = Math.ceil(total / pageSize);
 
     const columns = [
         { key: "id", label: "ID", sortable: true },

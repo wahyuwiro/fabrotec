@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Tech Challenge",
-  description: "Product Page Optimisation)",
+  description: "Product Page Optimisation",
 };
 
 export default function RootLayout({
