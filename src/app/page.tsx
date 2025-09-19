@@ -24,8 +24,6 @@ export default function ProductPage() {
 
     const [page, setPage] = useState(1);
 
-    const [sortKey, setSortKey] = useState<keyof Product | null>(null);
-
     const [filterKey, setFilterKey] = useState<keyof Product | "">("");
     const [filterValue, setFilterValue] = useState("");;
 
@@ -69,24 +67,17 @@ export default function ProductPage() {
       
     // Sorting
     const sorted = useMemo(() => {
-    if (!sortKey) return filtered;
+    if (!sortBy) return filtered;
     return [...filtered].sort((a, b) => {
-        const aVal = a[sortKey];
-        const bVal = b[sortKey];
+        const aVal = a[sortBy];
+        const bVal = b[sortBy];
         if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
         if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
         return 0;
     });
-    }, [filtered, sortKey, sortOrder]);
+    }, [filtered, sortBy, sortOrder]);
     const paginated = sorted;
 
-    useEffect(() => {
-        console.log("Sorted data changed", {
-            sorted,
-            products    
-        })
-    },[sorted,products]);
-    
     // Pagination
     const totalPages = Math.ceil(total / pageSize);
 
@@ -111,10 +102,11 @@ export default function ProductPage() {
       
 
     const handleSort = (key: keyof Product) => {
-    if (sortKey === key) {
+    if (sortBy === key) {
         setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
-        setSortKey(key);
+        // setSortKey(key);
+        setSortBy(key);
         setSortOrder("asc");
     }
     };
@@ -149,7 +141,7 @@ export default function ProductPage() {
             data={paginated}
             columns={columns}
             onSort={handleSort}
-            sortKey={sortKey}
+            sortKey={sortBy}
             sortOrder={sortOrder}
         />
 
