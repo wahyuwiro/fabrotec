@@ -142,9 +142,12 @@ export default function ProductPage() {
         <div className="flex justify-between mt-4">
             <div className="flex gap-2 mt-4">
             <select
-            className="border px-2 py-1 rounded"
-            value={pageSize}
-            onChange={(e) => setPageSize(Number(e.target.value))}
+              className="border px-2 py-1 rounded"
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setPage(1);
+              }}
             >
                 {rowsPerPageOptions.map((size) => (
                 <option
